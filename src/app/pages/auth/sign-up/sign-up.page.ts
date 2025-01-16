@@ -25,6 +25,7 @@ export class SignUpPage implements OnInit {
   utilsService = inject(UtilsService);
 
   form = new FormGroup({
+    uid: new FormControl(''),
     name: new FormControl('', [Validators.required, Validators.minLength(4)]),
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
@@ -41,7 +42,9 @@ export class SignUpPage implements OnInit {
     await loading.present();
     this.firebaseService.signUp(this.form.value as User).then(res => {
       this.firebaseService.updateUser(this.form.value.name!)
-      console.log(res);
+      let uid = res.user.uid;
+      this.form.controls.uid.setValue(uid);
+      this.setUserInfo(uid);
     }).catch(error => {
       this.utilsService.presentToast({
         color: "danger",
@@ -53,5 +56,34 @@ export class SignUpPage implements OnInit {
     }).finally(() => {
       loading.dismiss();
     })
+  }
+
+  async setUserInfo(uid: string) {
+    if(this.form.valid) {
+      const loading = await this.utilsService.loading();
+      await loading.present();
+
+      let path :string = `users/${uid}`;
+      delete this.form.value.password;
+
+      
+
+      this.firebaseService.setDocument(path, this.form.value).then(res => {
+
+        this.utilsService.saveInLocalStorage('user', this.form.value)
+        this.form.reset();
+        this.utilsService.routerLink("/home")
+      }).catch(error => {
+        this.utilsService.presentToast({
+          color: "danger",
+          duration: 2500,
+          message: error.message,
+          position: "middle",
+          icon: 'alert-circle-outline'
+        })
+      }).finally(() => {
+        loading.dismiss();
+      })
+    }
   }
 }
