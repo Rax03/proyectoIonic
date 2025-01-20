@@ -4,7 +4,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonContent, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { HeaderComponent } from "../../shared/components/header/header.component";
 import { CustomInputComponent } from "../../shared/components/custom-input/custom-input.component";
-import { lockClosedOutline, mailOutline, logInOutline, personAddOutline, alertCircleOutline } from 'ionicons/icons';
+import { personCircle, lockClosedOutline, mailOutline, logInOutline, personAddOutline, alertCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { LogoComponent } from "../../shared/components/logo/logo.component";
 import { RouterLink } from '@angular/router';
@@ -29,7 +29,7 @@ export class AuthPage implements OnInit {
     password: new FormControl('', [Validators.required])
   })
 
-  constructor() { addIcons({ mailOutline, lockClosedOutline, logInOutline, personAddOutline, alertCircleOutline }); }
+  constructor() { addIcons({ personCircle, mailOutline, lockClosedOutline, logInOutline, personAddOutline, alertCircleOutline }); }
 
   ngOnInit() {
   }
@@ -39,7 +39,7 @@ export class AuthPage implements OnInit {
     const loading = await this.utilsService.loading();
     await loading.present();
     this.firebaseService.signIn(this.form.value as User).then(res => {
-      console.log(res);
+      this.getUserInfo(res.user.uid);
     }).catch(error => {
       this.utilsService.presentToast({
         color: "danger",
@@ -51,5 +51,38 @@ export class AuthPage implements OnInit {
     }).finally(() => {
       loading.dismiss();
     })
+  }
+
+  async getUserInfo(uid: string) {
+    if (this.form.valid) {
+      const loading = await this.utilsService.loading();
+      await loading.present();
+
+      let path: string = `users/${uid}`;
+
+      this.firebaseService.getDocument(path).then((userData: any) => {
+        const user: User = userData;
+        this.utilsService.saveInLocalStorage('user', user);
+        this.utilsService.presentToast({
+          color: "success",
+          duration: 1500,
+          message: `Sesión iniciada como ${user.name}`,
+          position: "middle",
+          icon: 'person-circle-outline'
+        })
+        this.form.reset();
+        this.utilsService.routerLink("/home")
+      }).catch(error => {
+        this.utilsService.presentToast({
+          color: "danger",
+          duration: 2500,
+          message: error.message,
+          position: "middle",
+          icon: 'alert-circle-outline'
+        })
+      }).finally(() => {
+        loading.dismiss();
+      })
+    }
   }
 }

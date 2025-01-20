@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, UserCredential } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, updateProfile, UserCredential } from '@angular/fire/auth';
 import { User } from '../models/user.model';
 import { doc, Firestore, getDoc, setDoc } from '@angular/fire/firestore';
+import { UnsubscriptionError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,11 @@ export class FirebaseService {
     );
   }
 
+  async signOut() {
+    await this.auth.signOut();
+    localStorage.removeItem('user');
+  }
+
   async updateUser(displayName: string) {
     const user = await this.auth.currentUser;
     if (user) {
@@ -45,5 +51,23 @@ export class FirebaseService {
   async getDocument(path: string) {
     const docSnap = await getDoc(doc(this.firestore, path));
     return docSnap.data();
+  }
+
+  sendRecoveryEmail(email: string) {
+    return sendPasswordResetEmail(this.auth, email);
+  }
+
+  async isAuthenticated() {
+    const userExists: boolean = await new Promise((resolve) => {
+      const unsubscribe = this.auth.onAuthStateChanged((user) => {
+        unsubscribe();
+        if (user) {
+          resolve (true);
+        } else {
+          resolve (false);
+        }
+      })
+    })
+    return userExists;
   }
 }

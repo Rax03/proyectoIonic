@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, UrlTree } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import { ToastController, ToastOptions } from '@ionic/angular';
+import { ToastController, ToastOptions, ModalController, ModalOptions } from '@ionic/angular/standalone';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +10,7 @@ export class UtilsService {
 
   loadingController = inject(LoadingController);
   toastController = inject(ToastController);
+  modalController = inject(ModalController);
   router = inject(Router);
 
   loading() {
@@ -25,6 +26,10 @@ export class UtilsService {
     return this.router.navigateByUrl(url);
   }
 
+  urlTree(url: string) : UrlTree {
+    return this.router.parseUrl(url);
+  }
+
   saveInLocalStorage(key: string, value: any) {
     return localStorage.setItem(key, JSON.stringify(value))
   }
@@ -32,6 +37,20 @@ export class UtilsService {
   getFromLocalStorage(key: string) {
     const valueString = localStorage.getItem(key);
     return valueString ? JSON.parse(valueString) : valueString;
+  }
+
+  async presentModal(modalOptions: ModalOptions) {
+    const modal = await this.modalController.create(modalOptions);
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    return data ?? null;
+  }
+
+  dismissModal(data?: any) {
+    return this.modalController.dismiss(data)
   }
 
   constructor() { }

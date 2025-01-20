@@ -10,6 +10,11 @@ import { environment } from './environments/environment.prod';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
+// Call the element loader before the bootstrapModule/bootstrapApplication call
+defineCustomElements(window);
+
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
