@@ -1,13 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonContent, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonButton, IonIcon, IonAvatar } from '@ionic/angular/standalone';
 import { HeaderComponent } from "../../../shared/components/header/header.component";
 import { CustomInputComponent } from "../../../shared/components/custom-input/custom-input.component";
-import { lockClosedOutline, mailOutline, bodyOutline, personOutline, alertCircleOutline } from 'ionicons/icons';
+import { lockClosedOutline, mailOutline, bodyOutline, personOutline, alertCircleOutline, imageOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { LogoComponent } from "../../../shared/components/logo/logo.component";
-import { RouterLink } from '@angular/router';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -16,7 +14,7 @@ import { UtilsService } from 'src/app/services/utils.service';
   selector: 'app-add-update-miniature',
   templateUrl: './add-update-miniature.component.html',
   styleUrls: ['./add-update-miniature.component.scss'],
-  imports: [RouterLink, IonIcon, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, CustomInputComponent, ReactiveFormsModule, LogoComponent]
+  imports: [ IonAvatar, IonIcon, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, CustomInputComponent, ReactiveFormsModule]
 })
 export class AddUpdateMiniatureComponent  implements OnInit {
 
@@ -31,9 +29,16 @@ export class AddUpdateMiniatureComponent  implements OnInit {
     strength: new FormControl('', [Validators.required, Validators.min(0)]),
   })
 
-  constructor() { addIcons({ mailOutline, lockClosedOutline, bodyOutline, alertCircleOutline, personOutline }); }
+  constructor() { addIcons({ mailOutline, lockClosedOutline, bodyOutline, alertCircleOutline, personOutline, imageOutline }); }
 
   ngOnInit() {
+  }
+
+  async takeImage() {
+    const dataUrl = (await this.utilsService.takePicture("Imagen de la miniatura")).dataUrl
+    if (dataUrl) {
+      this.form.controls.image.setValue(dataUrl);
+    }
   }
 
   async submit() {
