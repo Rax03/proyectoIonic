@@ -65,6 +65,9 @@ export class UtilsService {
       promptLabelPicture: "Saca una foto"
     });
   };
+  getLocalStorageUser() {
+    return this.getFromLocalStorage('user')
+  }
 
   constructor() { }
 }

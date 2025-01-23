@@ -4,11 +4,12 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IonContent, IonButton, IonIcon, IonAvatar } from '@ionic/angular/standalone';
 import { HeaderComponent } from "../../../shared/components/header/header.component";
 import { CustomInputComponent } from "../../../shared/components/custom-input/custom-input.component";
-import { lockClosedOutline, mailOutline, bodyOutline, personOutline, alertCircleOutline, imageOutline } from 'ionicons/icons';
+import { lockClosedOutline, mailOutline, bodyOutline, personOutline, alertCircleOutline, imageOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';
 import { UtilsService } from 'src/app/services/utils.service';
+import { SupabaseService } from 'src/app/services/supabase.service';
 
 @Component({
   selector: 'app-add-update-miniature',
@@ -20,6 +21,8 @@ export class AddUpdateMiniatureComponent  implements OnInit {
 
   firebaseService = inject(FirebaseService);
   utilsService = inject(UtilsService);
+  supabaseService = inject(SupabaseService)
+  user :User = {} as User;
 
   form = new FormGroup({
     id: new FormControl(''),
@@ -29,9 +32,11 @@ export class AddUpdateMiniatureComponent  implements OnInit {
     strength: new FormControl('', [Validators.required, Validators.min(0)]),
   })
 
-  constructor() { addIcons({ mailOutline, lockClosedOutline, bodyOutline, alertCircleOutline, personOutline, imageOutline }); }
+  constructor() { addIcons({ mailOutline, lockClosedOutline, bodyOutline, alertCircleOutline, personOutline, imageOutline, checkmarkCircleOutline }); }
 
-  ngOnInit() {
+  ngOnInit(
+  ) {
+    this.user = this.utilsService.getLocalStorageUser();
   }
 
   async takeImage() {
@@ -45,9 +50,24 @@ export class AddUpdateMiniatureComponent  implements OnInit {
 
     const loading = await this.utilsService.loading();
     await loading.present();
-    this.firebaseService.signUp(this.form.value as User).then(res => {
-      this.firebaseService.updateUser(this.form.value.name!)
-      let uid = res.user.uid;
+
+    const path: string = `users/${this.user.uid}/miniatures`
+
+    const imageDataUrl = this.form.value.image;
+    const imagePath = `${this.user.uid}/${Date.now()}`
+    const imageUrl = await this.supabaseService.uploadImage(imagePath, imageDataUrl!)
+    this.form.controls.image.setValue(imageUrl)
+    delete this.form.value.id;
+
+    this.firebaseService.addDocument(path, this.form.value).then(res => {
+    this.utilsService.dismissModal({ success: true});
+    this.utilsService.presentToast({
+      color: "success",
+      duration: 1500,
+      message: "Miniatura añadida exitosamente",
+      position: "middle",
+      icon: 'checkmark-circle-outline'
+    })
     }).catch(error => {
       this.utilsService.presentToast({
         color: "danger",

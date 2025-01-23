@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, updateProfile, UserCredential } from '@angular/fire/auth';
 import { User } from '../models/user.model';
-import { doc, Firestore, getDoc, setDoc, addDoc, collection } from '@angular/fire/firestore';
+import { doc, Firestore, getDoc, setDoc, addDoc, collection, collectionData, query } from '@angular/fire/firestore';
 import { UnsubscriptionError } from 'rxjs';
 import { uploadString } from '@firebase/storage';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
@@ -58,6 +58,11 @@ export class FirebaseService {
   async getDocument(path: string) {
     const docSnap = await getDoc(doc(this.firestore, path));
     return docSnap.data();
+  }
+
+  async getCollectionData(path: string, collectionQuery? :any) {
+    const ref = collection(this.firestore, path)
+    return collectionData(query(ref, collectionQuery))
   }
 
   sendRecoveryEmail(email: string) {
