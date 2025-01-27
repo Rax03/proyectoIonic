@@ -3,3 +3,36 @@
         --height: 680px;
     }
 }
+
+.miniature-item {
+    --padding-top: 20px;
+
+    ion-avatar {
+        width: 70px;
+        height: 80px;
+        --border-radius: 15px;
+    }
+
+    .name {
+        font-weight: 700;
+        padding-bottom: 5px;
+    }
+
+    .option-btn {
+        font-size: 27px;
+    }
+
+    .data {
+        font-size: 13px;
+
+        strong {
+            font-weight: 600;
+        }
+    }
+
+    ion-chip {
+        font-size: 14px;
+        border-radius: 10px;
+        margin-left: 0;
+    }
+}
