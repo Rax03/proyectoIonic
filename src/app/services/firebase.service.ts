@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { Directive, inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, updateProfile, UserCredential } from '@angular/fire/auth';
 import { User } from '../models/user.model';
 import { doc, Firestore, getDoc, setDoc, addDoc, collection, collectionData, query, updateDoc, deleteDoc } from '@angular/fire/firestore';
@@ -6,9 +6,15 @@ import { UnsubscriptionError } from 'rxjs';
 import { deleteObject, uploadString } from '@firebase/storage';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
 
+export interface QueryOptions {
+  orderBy?: { field: string, direction?: 'asc' | 'desc'};
+  limit?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
 export class FirebaseService {
   auth = inject(Auth);
   firestore = inject(Firestore);

@@ -1,30 +1,32 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonFab, IonFabButton, IonIcon, IonLabel, IonItem, IonItemSliding, IonList, IonItemOptions, IonItemOption, IonAvatar, IonChip } from '@ionic/angular/standalone';
+import { IonContent, IonFab, IonFabButton, IonIcon, IonLabel, IonItem, IonItemSliding, IonList, IonItemOptions, IonItemOption, IonAvatar, IonChip, IonSkeletonText } from '@ionic/angular/standalone';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { HeaderComponent } from "../../../shared/components/header/header.component";
 import { addIcons } from 'ionicons';
-import { add, createOutline, trashOutline } from 'ionicons/icons';
+import { add, createOutline, trashOutline, bodyOutline } from 'ionicons/icons';
 import { AddUpdateMiniatureComponent } from 'src/app/shared/components/add-update-miniature/add-update-miniature.component';
 import { Miniature } from 'src/app/models/miniature.model';
 import { User } from 'src/app/models/user.model';
 import { SupabaseService } from 'src/app/services/supabase.service';
+import { GoTrueAdminApi } from '@supabase/supabase-js';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   standalone: true,
-  imports: [IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonSkeletonText, IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
 export class HomePage implements OnInit {
   utilsService = inject(UtilsService);
   firebaseService = inject(FirebaseService)
   supabaseService = inject(SupabaseService);
   miniatures: Miniature[] = [];
-  constructor() { addIcons({ createOutline, trashOutline, add }); }
+  loading: boolean = false;
+  constructor() { addIcons({createOutline,trashOutline,bodyOutline,add}); }
 
   ngOnInit() {
   }
@@ -36,6 +38,7 @@ export class HomePage implements OnInit {
   // }
 
   async getMiniatures() {
+    this.loading = true;
     const user = this.utilsService.getLocalStorageUser();
     const path: string = `users/${user.uid}/miniatures`;
 
@@ -44,12 +47,16 @@ export class HomePage implements OnInit {
         sub.unsubscribe();
 
         this.miniatures = res;
+        this.loading = false;
       },
     });
   }
 
-  addUpdateMiniature(miniature?: Miniature) {
-    this.utilsService.presentModal({ component: AddUpdateMiniatureComponent, cssClass: "add-update-modal", componentProps: { miniature } })
+  async addUpdateMiniature(miniature?: Miniature) {
+    let success = await this.utilsService.presentModal({ component: AddUpdateMiniatureComponent, cssClass: "add-update-modal", componentProps: { miniature } })
+    if (success) {
+      this.getMiniatures()
+    }
   }
 
   ionViewWillEnter() {
