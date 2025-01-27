@@ -44,4 +44,28 @@ export class SupabaseService {
   
       return new Blob([u8arr], { type: mime });
     }
+
+    getFilePath(publicUrl: string): string | null {
+      try {
+        const url = new URL(publicUrl);
+
+        // Buscar el segmento `/storage/v1/object/public/`
+        const publicPrefix = '/storage/v1/object/public/' + environment.supabaseConfig.bucket+'/';
+        const startIndex = url.pathname.indexOf(publicPrefix);
+  
+        if (startIndex === -1) {
+          throw new Error(
+            'La URL no es válida o no pertenece a Supabase Storage.'
+          );
+        }
+  
+        // Obtener el resto de la ruta después del prefijo
+        const filePath = url.pathname.substring(startIndex + publicPrefix.length);
+  
+        return filePath;
+      } catch (error) {
+        console.error('Error al extraer el path del archivo:', error);
+        return null;
+      }
+    }
 }

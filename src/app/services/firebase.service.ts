@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, updateProfile, UserCredential } from '@angular/fire/auth';
 import { User } from '../models/user.model';
-import { doc, Firestore, getDoc, setDoc, addDoc, collection, collectionData, query } from '@angular/fire/firestore';
+import { doc, Firestore, getDoc, setDoc, addDoc, collection, collectionData, query, updateDoc } from '@angular/fire/firestore';
 import { UnsubscriptionError } from 'rxjs';
 import { uploadString } from '@firebase/storage';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
@@ -55,6 +55,10 @@ export class FirebaseService {
     return addDoc(collection(this.firestore, path), data)
   }
 
+  updateDocument(path: string, data: any) {
+    return updateDoc(doc(this.firestore, path), data)
+  }
+
   async getDocument(path: string) {
     const docSnap = await getDoc(doc(this.firestore, path));
     return docSnap.data();
@@ -62,7 +66,7 @@ export class FirebaseService {
 
   async getCollectionData(path: string, collectionQuery? :any) {
     const ref = collection(this.firestore, path)
-    return collectionData(query(ref, collectionQuery))
+    return collectionData(query(ref, collectionQuery), {idField: 'id'})
   }
 
   sendRecoveryEmail(email: string) {
@@ -87,5 +91,9 @@ export class FirebaseService {
     return uploadString(ref(this.storage, path), imageDataUrl, 'data_url').then( () => {
       return getDownloadURL(ref(this.storage, path))
     })
+  }
+
+  async getFilePath(url: string) {
+    return ref(this.storage, url).fullPath
   }
 }

@@ -45,8 +45,8 @@ export class HomePage implements OnInit {
     });
   }
 
-  addUpdateMiniature() {
-    this.utilsService.presentModal({component: AddUpdateMiniatureComponent, cssClass: "add-update-modal"})
+  addUpdateMiniature( miniature? :Miniature) {
+    this.utilsService.presentModal({component: AddUpdateMiniatureComponent, cssClass: "add-update-modal", componentProps: {miniature}})
   }
   
   ionViewWillEnter() {
