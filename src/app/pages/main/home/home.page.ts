@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, MinLengthValidator } from '@angular/forms';
-import { IonContent, IonButton, IonFab, IonFabButton, IonIcon, IonLabel, IonItem, IonItemSliding, IonList, IonItemOptions, IonItemOption, IonAvatar, IonChip } from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonFab, IonFabButton, IonIcon, IonLabel, IonItem, IonItemSliding, IonList, IonItemOptions, IonItemOption, IonAvatar, IonChip } from '@ionic/angular/standalone';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { HeaderComponent } from "../../../shared/components/header/header.component";
@@ -9,19 +9,22 @@ import { addIcons } from 'ionicons';
 import { add, createOutline, trashOutline } from 'ionicons/icons';
 import { AddUpdateMiniatureComponent } from 'src/app/shared/components/add-update-miniature/add-update-miniature.component';
 import { Miniature } from 'src/app/models/miniature.model';
+import { User } from 'src/app/models/user.model';
+import { SupabaseService } from 'src/app/services/supabase.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   standalone: true,
-  imports: [IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
 export class HomePage implements OnInit {
   utilsService = inject(UtilsService);
   firebaseService = inject(FirebaseService)
+  supabaseService = inject(SupabaseService);
   miniatures: Miniature[] = [];
-  constructor() { addIcons({createOutline,trashOutline,add}); }
+  constructor() { addIcons({ createOutline, trashOutline, add }); }
 
   ngOnInit() {
   }
@@ -45,12 +48,63 @@ export class HomePage implements OnInit {
     });
   }
 
-  addUpdateMiniature( miniature? :Miniature) {
-    this.utilsService.presentModal({component: AddUpdateMiniatureComponent, cssClass: "add-update-modal", componentProps: {miniature}})
+  addUpdateMiniature(miniature?: Miniature) {
+    this.utilsService.presentModal({ component: AddUpdateMiniatureComponent, cssClass: "add-update-modal", componentProps: { miniature } })
   }
-  
+
   ionViewWillEnter() {
     this.getMiniatures();
   }
-  
+
+  confirmDeleteMiniature(miniature: Miniature) {
+    this.utilsService.presentAlert({
+      header: 'Eliminar miniatura',
+      message: '¿Está seguro de que desea eliminar la miniatura?',
+      buttons: [
+        {
+          text: 'No'
+        }, {
+          text: 'Sí',
+          handler: () => {
+            this.deleteMiniature(miniature);
+          }
+        }
+      ]
+    });
+  }
+
+  async deleteMiniature(miniature: Miniature) {
+
+    const loading = await this.utilsService.loading();
+    await loading.present();
+
+    const user: User = this.utilsService.getLocalStorageUser()
+
+    const path: string = `users/${user.uid}/miniatures/${miniature.id}`
+
+    const imagePath = this.supabaseService.getFilePath(miniature.image)
+    await this.supabaseService.deleteFile(imagePath!);
+
+    this.firebaseService.deleteDocument(path).then(res => {
+      this.miniatures = this.miniatures.filter(listedMiniature => listedMiniature.id !== miniature.id)
+      this.utilsService.presentToast({
+        color: "success",
+        duration: 1500,
+        message: "Miniatura borrada exitosamente",
+        position: "middle",
+        icon: 'checkmark-circle-outline'
+      })
+    }).catch(error => {
+      this.utilsService.presentToast({
+        color: "danger",
+        duration: 2500,
+        message: error.message,
+        position: "middle",
+        icon: 'alert-circle-outline'
+      })
+    }).finally(() => {
+      loading.dismiss();
+    })
+  }
+
 }

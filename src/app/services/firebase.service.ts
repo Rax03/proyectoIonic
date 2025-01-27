@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, updateProfile, UserCredential } from '@angular/fire/auth';
 import { User } from '../models/user.model';
-import { doc, Firestore, getDoc, setDoc, addDoc, collection, collectionData, query, updateDoc } from '@angular/fire/firestore';
+import { doc, Firestore, getDoc, setDoc, addDoc, collection, collectionData, query, updateDoc, deleteDoc } from '@angular/fire/firestore';
 import { UnsubscriptionError } from 'rxjs';
-import { uploadString } from '@firebase/storage';
+import { deleteObject, uploadString } from '@firebase/storage';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
 
 @Injectable({
@@ -59,6 +59,10 @@ export class FirebaseService {
     return updateDoc(doc(this.firestore, path), data)
   }
 
+deleteDocument(path: string) {
+  return deleteDoc(doc(this.firestore, path));
+}
+
   async getDocument(path: string) {
     const docSnap = await getDoc(doc(this.firestore, path));
     return docSnap.data();
@@ -95,5 +99,9 @@ export class FirebaseService {
 
   async getFilePath(url: string) {
     return ref(this.storage, url).fullPath
+  }
+
+  async deleteFile(path: string) {
+    return deleteObject(ref(this.storage, path))
   }
 }

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import { ToastController, ToastOptions, ModalController, ModalOptions } from '@ionic/angular/standalone';
+import { ToastController, ToastOptions, ModalController, ModalOptions, AlertController, AlertOptions } from '@ionic/angular/standalone';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Injectable({
@@ -12,6 +12,7 @@ export class UtilsService {
   loadingController = inject(LoadingController);
   toastController = inject(ToastController);
   modalController = inject(ModalController);
+  alertController = inject(AlertController);
   router = inject(Router);
 
   loading() {
@@ -67,6 +68,13 @@ export class UtilsService {
   };
   getLocalStorageUser() {
     return this.getFromLocalStorage('user')
+  }
+
+
+  async presentAlert(alertOptions?: AlertOptions | undefined) {
+    const alert = await this.alertController.create(alertOptions);
+  
+    await alert.present();
   }
 
   constructor() { }

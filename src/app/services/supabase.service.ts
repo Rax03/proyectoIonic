@@ -68,4 +68,18 @@ export class SupabaseService {
         return null;
       }
     }
+    async deleteFile(filePath: string): Promise<boolean> {
+      try {
+        const { error } = await this.supabase.storage
+          .from(environment.supabaseConfig.bucket)
+          .remove([filePath]);
+        if (error) {
+          return false;
+        }
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
 }
