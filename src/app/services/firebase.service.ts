@@ -1,15 +1,12 @@
 import { Directive, inject, Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, updateProfile, UserCredential } from '@angular/fire/auth';
 import { User } from '../models/user.model';
-import { doc, Firestore, getDoc, setDoc, addDoc, collection, collectionData, query, updateDoc, deleteDoc } from '@angular/fire/firestore';
+import { doc, Firestore, getDoc, setDoc, addDoc, collection, collectionData, query, updateDoc, deleteDoc, QueryConstraint, orderBy, limit } from '@angular/fire/firestore';
 import { UnsubscriptionError } from 'rxjs';
 import { deleteObject, uploadString } from '@firebase/storage';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
+import { QueryOptions } from './query-options.interface';
 
-export interface QueryOptions {
-  orderBy?: { field: string, direction?: 'asc' | 'desc'};
-  limit?: number;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -74,9 +71,28 @@ deleteDocument(path: string) {
     return docSnap.data();
   }
 
-  async getCollectionData(path: string, collectionQuery? :any) {
+  buildQueryConstraints(options?: QueryOptions) : QueryConstraint[] {
+    const constraints: QueryConstraint[] = []
+    if (options?.orderBy) {
+      constraints.push(
+        orderBy(options?.orderBy.field, options?.orderBy.direction)
+      )
+    }
+
+    if (options?.limit) {
+      constraints.push(
+        limit(options?.limit)
+      )
+    }
+
+    return constraints;
+  }
+
+
+  async getCollectionData(path: string, collectionQuery? :QueryOptions) {
     const ref = collection(this.firestore, path)
-    return collectionData(query(ref, collectionQuery), {idField: 'id'})
+    const constraints = this.buildQueryConstraints(collectionQuery);
+    return collectionData(query(ref, ...constraints), {idField: 'id'})
   }
 
   sendRecoveryEmail(email: string) {

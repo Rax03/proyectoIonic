@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonFab, IonFabButton, IonIcon, IonLabel, IonItem, IonItemSliding, IonList, IonItemOptions, IonItemOption, IonAvatar, IonChip, IonSkeletonText } from '@ionic/angular/standalone';
+import { IonContent, IonFab, IonFabButton, IonIcon, IonLabel, IonItem, IonItemSliding, IonList, IonItemOptions, IonItemOption, IonAvatar, IonChip, IonSkeletonText, IonRefresher, IonRefresherContent, RefresherEventDetail } from '@ionic/angular/standalone';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { HeaderComponent } from "../../../shared/components/header/header.component";
@@ -11,16 +11,18 @@ import { AddUpdateMiniatureComponent } from 'src/app/shared/components/add-updat
 import { Miniature } from 'src/app/models/miniature.model';
 import { User } from 'src/app/models/user.model';
 import { SupabaseService } from 'src/app/services/supabase.service';
-import { GoTrueAdminApi } from '@supabase/supabase-js';
+import { QueryOptions } from '../../../services/query-options.interface';
+import { IonRefresherCustomEvent } from '@ionic/core';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   standalone: true,
-  imports: [IonSkeletonText, IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonRefresherContent, IonRefresher, IonSkeletonText, IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
 export class HomePage implements OnInit {
+
   utilsService = inject(UtilsService);
   firebaseService = inject(FirebaseService)
   supabaseService = inject(SupabaseService);
@@ -41,13 +43,27 @@ export class HomePage implements OnInit {
     this.loading = true;
     const user = this.utilsService.getLocalStorageUser();
     const path: string = `users/${user.uid}/miniatures`;
+    const queryOptions: QueryOptions = {orderBy: {field: "strength", direction: "desc"}}
 
-    let sub = (await this.firebaseService.getCollectionData(path)).subscribe({
+    let timer: any;
+
+    const resetTimer = () => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          sub.unsubscribe();
+
+        }, 5000) 
+    };
+
+    let sub = (await this.firebaseService.getCollectionData(path, queryOptions)).subscribe({
       next: (res: any) => {
-        sub.unsubscribe();
-
+        console.log("Recibido cambio")
+        console.log(res)
         this.miniatures = res;
         this.loading = false;
+        resetTimer();
       },
     });
   }
@@ -113,5 +129,10 @@ export class HomePage implements OnInit {
       loading.dismiss();
     })
   }
-
+  doRefresh(event: any) {
+    setTimeout(() => {
+      this.getMiniatures();
+      event.target.complete();
+    }, 2000);
+  }
 }
