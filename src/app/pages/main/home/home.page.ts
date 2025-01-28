@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonFab, IonFabButton, IonIcon, IonLabel, IonItem, IonItemSliding, IonList, IonItemOptions, IonItemOption, IonAvatar, IonChip, IonSkeletonText, IonRefresher, IonRefresherContent, RefresherEventDetail } from '@ionic/angular/standalone';
+import { IonContent, IonFab, IonFabButton, IonIcon, IonLabel, IonItem, IonItemSliding, IonList, IonItemOptions, IonItemOption, IonAvatar, IonChip, IonSkeletonText, IonRefresher, IonRefresherContent, RefresherEventDetail, IonCard } from '@ionic/angular/standalone';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { HeaderComponent } from "../../../shared/components/header/header.component";
@@ -19,10 +19,10 @@ import { IonRefresherCustomEvent } from '@ionic/core';
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   standalone: true,
-  imports: [IonRefresherContent, IonRefresher, IonSkeletonText, IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonContent, CommonModule, FormsModule, HeaderComponent]
+  imports: [IonCard, IonRefresherContent, IonRefresher, IonSkeletonText, IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
-export class HomePage implements OnInit {
 
+export class HomePage implements OnInit {
   utilsService = inject(UtilsService);
   firebaseService = inject(FirebaseService)
   supabaseService = inject(SupabaseService);
@@ -134,5 +134,8 @@ export class HomePage implements OnInit {
       this.getMiniatures();
       event.target.complete();
     }, 2000);
+  }
+  getTotalPower() {
+    return this.miniatures.reduce((total, miniature) => total + miniature.strength * miniature.units, 0)
   }
 }
