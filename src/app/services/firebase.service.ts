@@ -40,6 +40,7 @@ export class FirebaseService {
   async signOut() {
     await this.auth.signOut();
     localStorage.removeItem('user');
+    window.location.reload();
   }
 
   async updateUser(displayName: string) {
