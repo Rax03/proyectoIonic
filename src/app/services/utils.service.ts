@@ -1,14 +1,20 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
-import { ToastController, ToastOptions, ModalController, ModalOptions, AlertController, AlertOptions } from '@ionic/angular/standalone';
+import {
+  ToastController,
+  ToastOptions,
+  ModalController,
+  ModalOptions,
+  AlertController,
+  AlertOptions,
+  LoadingController
+} from '@ionic/angular/standalone';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UtilsService {
-
   loadingController = inject(LoadingController);
   toastController = inject(ToastController);
   modalController = inject(ModalController);
@@ -16,24 +22,24 @@ export class UtilsService {
   router = inject(Router);
 
   loading() {
-    return this.loadingController.create( {spinner: "crescent" })
+    return this.loadingController.create({ spinner: 'crescent' });
   }
 
-  async presentToast(toastOptions? :ToastOptions | undefined) {
+  async presentToast(toastOptions?: ToastOptions | undefined) {
     const toast = await this.toastController.create(toastOptions);
-    toast.present()
+    toast.present();
   }
 
   routerLink(url: string) {
     return this.router.navigateByUrl(url);
   }
 
-  urlTree(url: string) : UrlTree {
+  urlTree(url: string): UrlTree {
     return this.router.parseUrl(url);
   }
 
   saveInLocalStorage(key: string, value: any) {
-    return localStorage.setItem(key, JSON.stringify(value))
+    return localStorage.setItem(key, JSON.stringify(value));
   }
 
   getFromLocalStorage(key: string) {
@@ -52,7 +58,7 @@ export class UtilsService {
   }
 
   dismissModal(data?: any) {
-    return this.modalController.dismiss(data)
+    return this.modalController.dismiss(data);
   }
 
   async takePicture(promptLabelHeader: string) {
@@ -62,20 +68,19 @@ export class UtilsService {
       resultType: CameraResultType.DataUrl,
       source: CameraSource.Prompt,
       promptLabelHeader,
-      promptLabelPhoto: "Seleccione una imagen",
-      promptLabelPicture: "Saca una foto"
+      promptLabelPhoto: 'Seleccione una imagen',
+      promptLabelPicture: 'Saca una foto',
     });
-  };
-  getLocalStorageUser() {
-    return this.getFromLocalStorage('user')
   }
-
+  getLocalStorageUser() {
+    return this.getFromLocalStorage('user');
+  }
 
   async presentAlert(alertOptions?: AlertOptions | undefined) {
     const alert = await this.alertController.create(alertOptions);
-  
+
     await alert.present();
   }
 
-  constructor() { }
+  constructor() {}
 }
