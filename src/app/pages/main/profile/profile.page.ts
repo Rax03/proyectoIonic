@@ -8,7 +8,7 @@ import { SupabaseService } from 'src/app/services/supabase.service';
 import { User } from 'src/app/models/user.model';
 import { HeaderComponent } from "../../../shared/components/header/header.component";
 import { addIcons } from 'ionicons';
-import { cameraOutline, personOutline } from 'ionicons/icons';
+import { cameraOutline, personOutline, personCircleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-profile',
@@ -24,7 +24,7 @@ export class ProfilePage implements OnInit {
   user :User;
   constructor() { 
     this.user = this.utilsService.getLocalStorageUser();
-    addIcons({cameraOutline,personOutline});
+    addIcons({personCircleOutline,cameraOutline,personOutline});
   }
 
   ngOnInit() {

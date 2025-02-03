@@ -1,7 +1,10 @@
 <ion-menu contentId="menu-content" menuId="menu-content" side="start" type="overlay">
 <app-header title="Menu"></app-header>
   <ion-content class="ion-text-center">
-    <ion-icon class="avatar-icon" name="person-circle-outline"></ion-icon>
+    <ion-avatar>
+      <ion-icon *ngIf="!user.image" class="avatar-icon" name="person-circle-outline"></ion-icon>
+      <img  *ngIf="user.image"  [src]="user.image" />
+    </ion-avatar>
     <h4>{{user.name}}</h4>
     <ion-menu-toggle auto-hide="false" *ngFor="let page of pages">
         <ion-item [routerLink]="page.url" routerLinkActive="active" routerDirection="root" detail>

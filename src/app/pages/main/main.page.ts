@@ -1,10 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonRouterOutlet, IonMenu, IonMenuToggle, IonLabel, IonItem, IonIcon, IonFooter } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { homeOutline, personOutline, pizza, logOutOutline, personCircleOutline } from 'ionicons/icons';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import {
+  IonContent,
+  IonMenu,
+  IonMenuToggle, IonLabel, IonItem, IonIcon, IonRouterOutlet, IonTitle, IonFooter, IonToolbar, IonAvatar } from '@ionic/angular/standalone';
+import { homeOutline, personOutline, logOutOutline, personCircleOutline, hardwareChipOutline } from 'ionicons/icons';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { HeaderComponent } from "../../shared/components/header/header.component";
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -15,35 +18,47 @@ import { User } from 'src/app/models/user.model';
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   standalone: true,
-  imports: [IonFooter, IonIcon, IonItem, IonLabel, IonRouterOutlet, IonContent, CommonModule, FormsModule, IonMenu, IonMenuToggle, RouterLink, HeaderComponent, RouterLinkActive]
+  imports: [IonAvatar, IonFooter, IonRouterOutlet, IonIcon, IonItem, IonLabel,
+    IonContent,
+    CommonModule,
+    FormsModule,
+    IonMenu,
+    IonMenuToggle,
+    RouterLink, RouterLinkActive, HeaderComponent],
 })
 export class MainPage implements OnInit {
-  user: User;
+  router = inject(Router);
   firebaseService = inject(FirebaseService);
-  utilsService = inject(UtilsService)
+  utilsService = inject(UtilsService);
   pages = [
     {
-      title: "Inicio",
-      url: "/main/home",
-      icon: "home-outline"
+      title: 'Inicio',
+      url: '/main/home',
+      icon: 'home-outline',
     },
     {
-      title: "Perfil",
-      url: "/main/profile",
-      icon: "person-outline"
+      title: 'Perfil',
+      url: '/main/profile',
+      icon: 'person-outline',
     },
-  ]
+    {
+      title: 'Sensores',
+      url: '/main/sensors',
+      icon: 'hardware-chip-outline',
+    },
+  ];
+
+  user: User;
 
   constructor() {
-    addIcons({ logOutOutline, pizza, homeOutline, personOutline, personCircleOutline });
-    this.user = this.utilsService.getLocalStorageUser();
+    addIcons({personCircleOutline,logOutOutline,personOutline,homeOutline, hardwareChipOutline});
+    this.user = this.utilsService.getLocalStorageUser()!;
   }
+
+  ngOnInit() {  }
 
   signOut() {
-    this.firebaseService.signOut().then(() => { this.utilsService.routerLink("/auth") })
+    this.firebaseService.signOut().then(() => {this.utilsService.routerLink("/auth");
+    });
   }
-
-  ngOnInit() {
-  }
-
 }
