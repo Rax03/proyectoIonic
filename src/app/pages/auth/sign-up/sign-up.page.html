@@ -2,7 +2,7 @@
 
 <ion-content>
  <div class="d-flex-center">
-  <form [formGroup]="form" class="signup-form">
+  <form [formGroup]="form" class="signup-form" (ngSubmit)="submit()">
     <app-logo></app-logo>
 
 
@@ -55,7 +55,7 @@
 
     <p class="ion-text-end" routerLink="/forgot-password">Olvidé mi contraseña</p>
 
-    <ion-button mode="ios" (click)="submit()" expand="block" class="submit" type="submit" [disabled]="form.invalid" >
+    <ion-button mode="ios" expand="block" class="submit" type="submit" [disabled]="form.invalid" >
       Crear usuario
       <ion-icon slot="end" name="person-add-outline"></ion-icon>
     </ion-button>
