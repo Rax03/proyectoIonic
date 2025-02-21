@@ -1,0 +1,60 @@
+<app-header [title]="personaje ? 'Editar personaje' : 'Añadir personaje'" [isModal]="true"></app-header>
+<ion-content>
+  <div class="d-flex-center">
+    <form [formGroup]="form" class="ion-padding ion-text-center">
+
+      <!-- Imagen -->
+      <ion-avatar *ngIf="form.value.image">
+        <img [src]="form.value.image" />
+      </ion-avatar>
+      <ion-icon name="image-outline" class="image-icon" *ngIf="!form.value.image"></ion-icon>
+      <br />
+      <ion-button (click)="takeImage()" size="small" mode="ios" shape="round">
+        Tomar / Seleccionar
+      </ion-button>
+
+      <!-- Nombre del personaje -->
+      <app-custom-input [control]="form.controls.name" type="text" label="Nombre del personaje"></app-custom-input>
+
+      <div class="validators" *ngIf="form.controls.name.errors && form.controls.name.touched">
+        <div *ngIf="form.controls.name.errors?.['required']">
+          Debe especificar un nombre
+        </div>
+        <div *ngIf="form.controls.name.errors?.['minlength']">
+          El nombre debe tener al menos 4 caracteres.
+        </div>
+      </div>
+
+      <!-- Nombre del anime -->
+      <app-custom-input [control]="form.controls.animeName" type="text" label="Nombre del Anime"></app-custom-input>
+
+      <div class="validators" *ngIf="form.controls.animeName.errors && form.controls.animeName.touched">
+        <div *ngIf="form.controls.animeName.errors?.['required']">
+          Debe especificar el nombre del anime
+        </div>
+      </div>
+
+      <!-- Género -->
+      <ion-item>
+        <ion-label>Género</ion-label>
+        <ion-select [formControl]="form.controls.genre" placeholder="Selecciona un género">
+          <ion-select-option value="masculino">Masculino</ion-select-option>
+          <ion-select-option value="femenino">Femenino</ion-select-option>
+          <ion-select-option value="otro">Otro</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="validators" *ngIf="form.controls.genre.errors && form.controls.genre.touched">
+        <div *ngIf="form.controls.genre.errors?.['required']">
+          Debe seleccionar un género
+        </div>
+      </div>
+
+      <!-- Botón para enviar -->
+      <ion-button mode="ios" (click)="submit()" expand="block" class="submit" type="submit" [disabled]="form.invalid">
+        {{ personaje ? 'Editar personaje' : 'Añadir personaje' }}
+        <ion-icon slot="end" name="body-outline"></ion-icon>
+      </ion-button>
+    </form>
+  </div>
+</ion-content>

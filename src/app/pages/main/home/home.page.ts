@@ -8,7 +8,7 @@ import { HeaderComponent } from "../../../shared/components/header/header.compon
 import { addIcons } from 'ionicons';
 import { add, createOutline, trashOutline, bodyOutline } from 'ionicons/icons';
 import { AddUpdateMiniatureComponent } from 'src/app/shared/components/add-update-miniature/add-update-miniature.component';
-import { Miniature } from 'src/app/models/miniature.model';
+import { Miniature } from 'src/app/models/personaje.model';
 import { User } from 'src/app/models/user.model';
 import { SupabaseService } from 'src/app/services/supabase.service';
 import { QueryOptions } from '../../../services/query-options.interface';
