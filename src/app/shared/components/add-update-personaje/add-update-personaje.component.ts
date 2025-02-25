@@ -2,40 +2,45 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonContent, IonButton, IonIcon, IonAvatar, IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
-import { HeaderComponent } from "../header/header.component";
-import { CustomInputComponent } from "../custom-input/custom-input.component";
+import { HeaderComponent } from "../../../shared/components/header/header.component";
+import { CustomInputComponent } from "../../../shared/components/custom-input/custom-input.component";
 import { lockClosedOutline, mailOutline, bodyOutline, personOutline, alertCircleOutline, imageOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';
 import { UtilsService } from 'src/app/services/utils.service';
 import { SupabaseService } from 'src/app/services/supabase.service';
-import { Personaje } from 'src/app/models/personaje.model'; // Aquí cambió "miniature" a "personaje"
 
+interface Personaje {
+  id: string | null;
+  name: string | null;
+  image: string | null;
+  animeName: string | null;
+  gender: string | null;
+}
 
 @Component({
-  selector: 'app-add-update-personaje',  // Cambié el nombre de "miniature" por "personaje"
+  selector: 'app-add-update-personaje',
   templateUrl: './add-update-personaje.component.html',
   styleUrls: ['./add-update-personaje.component.scss'],
-  imports: [IonAvatar, IonIcon, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, CustomInputComponent, ReactiveFormsModule, IonItem, IonLabel, IonSelectOption]
+  imports: [IonAvatar, IonIcon, IonButton, IonContent, CommonModule, FormsModule, HeaderComponent, CustomInputComponent, ReactiveFormsModule, IonItem, IonLabel, IonSelect, IonSelectOption]
 })
-export class AddUpdatePersonajeComponent implements OnInit {  // Cambié el nombre del componente
-  @Input() personaje: Personaje | null = null;  // Aquí también se cambió "miniature" por "personaje"
-  
+export class AddUpdatePersonajeComponent implements OnInit {
+  @Input() personaje: Personaje | null = null;
   firebaseService = inject(FirebaseService);
   utilsService = inject(UtilsService);
   supabaseService = inject(SupabaseService);
   user: User = {} as User;
 
   form = new FormGroup({
+    id: new FormControl(''),
     name: new FormControl('', [Validators.required, Validators.minLength(4)]),
-    animeName: new FormControl('', [Validators.required]),
-    genre: new FormControl('', [Validators.required]),
-    image: new FormControl(''),
+    image: new FormControl('', [Validators.required]),
+    animeName: new FormControl('', [Validators.required, Validators.minLength(4)]),
+    gender: new FormControl('', [Validators.required, Validators.minLength(0)]),
   });
-  
 
-  constructor() { 
+  constructor() {
     addIcons({ mailOutline, lockClosedOutline, bodyOutline, alertCircleOutline, personOutline, imageOutline, checkmarkCircleOutline });
   }
 
@@ -43,9 +48,11 @@ export class AddUpdatePersonajeComponent implements OnInit {  // Cambié el nomb
     this.user = this.utilsService.getLocalStorageUser();
     if (this.personaje) {
       this.form.setValue({
-        ...this.personaje,
-        animeName: this.personaje.animeName || '',
-        genre: this.personaje.genre || ''
+        id: this.personaje.id,
+        name: this.personaje.name,
+        image: this.personaje.image,
+        animeName: this.personaje.animeName,
+        gender: this.personaje.gender
       });
     }
   }
@@ -59,31 +66,29 @@ export class AddUpdatePersonajeComponent implements OnInit {  // Cambié el nomb
 
   async submit() {
     if (this.personaje) {
-      this.updatePersonaje();  // Se cambió el nombre de "updateMiniature" por "updatePersonaje"
+      this.updatePersonaje();
     } else {
-      this.createPersonaje();  // Se cambió el nombre de "createMiniature" por "createPersonaje"
+      this.createPersonaje();
     }
   }
 
-  async createPersonaje() {  // Cambié "createMiniature" por "createPersonaje"
+  async createPersonaje() {
     const loading = await this.utilsService.loading();
     await loading.present();
 
-    const path: string = `users/${this.user.uid}/personajes`;  // Cambié "miniatures" por "personajes"
-
+    const path: string = `users/${this.user.uid}/miniatures`;
     const imageDataUrl = this.form.value.image;
     const imagePath = `${this.user.uid}/${Date.now()}`;
     const imageUrl = await this.supabaseService.uploadImage(imagePath, imageDataUrl!);
     this.form.controls.image.setValue(imageUrl);
-
-    delete this.form.value.name;
+    delete this.form.value.id;
 
     this.firebaseService.addDocument(path, this.form.value).then(res => {
       this.utilsService.dismissModal({ success: true });
       this.utilsService.presentToast({
         color: "success",
         duration: 1500,
-        message: "Personaje añadido exitosamente",  // Mensaje modificado
+        message: "Personaje añadido exitosamente",
         position: "middle",
         icon: 'checkmark-circle-outline'
       });
@@ -100,27 +105,26 @@ export class AddUpdatePersonajeComponent implements OnInit {  // Cambié el nomb
     });
   }
 
-  async updatePersonaje() {  // Cambié "updateMiniature" por "updatePersonaje"
+  async updatePersonaje() {
     const loading = await this.utilsService.loading();
     await loading.present();
 
-    const path: string = `users/${this.user.uid}/personajes/${this.personaje!.id}`;  // Cambié "miniatures" por "personajes"
+    const path: string = `users/${this.user.uid}/personaje/${this.personaje!.id}`;
 
     if (this.form.value.image !== this.personaje!.image) {
       const imageDataUrl = this.form.value.image;
-      const imagePath = this.supabaseService.getFilePath(this.personaje!.image);
+      const imagePath = this.supabaseService.getFilePath(this.personaje?.image ?? '');
       const imageUrl = await this.supabaseService.uploadImage(imagePath!, imageDataUrl!);
       this.form.controls.image.setValue(imageUrl);
     }
-
-    delete this.form.value.name;
+    delete this.form.value.id;
 
     this.firebaseService.updateDocument(path, this.form.value).then(res => {
       this.utilsService.dismissModal({ success: true });
       this.utilsService.presentToast({
         color: "success",
         duration: 1500,
-        message: "Personaje editado exitosamente",  // Mensaje modificado
+        message: "Personaje editado exitosamente",
         position: "middle",
         icon: 'checkmark-circle-outline'
       });

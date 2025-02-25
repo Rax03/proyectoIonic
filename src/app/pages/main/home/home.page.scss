@@ -4,7 +4,7 @@
     }
 }
 
-.miniature-item {
+.personaje-item {
     --padding-top: 20px;
 
     ion-avatar {
@@ -35,7 +35,6 @@
         border-radius: 10px;
         margin-left: 0;
     }
-
 }
 
 .empty {
@@ -53,6 +52,6 @@ ion-card {
     border-radius: 15px;
 }
 
-.miniatures-list {
+.personajes-list {
     padding-bottom: 70px;
 }

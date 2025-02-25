@@ -7,12 +7,12 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { HeaderComponent } from "../../../shared/components/header/header.component";
 import { addIcons } from 'ionicons';
 import { add, createOutline, trashOutline, bodyOutline } from 'ionicons/icons';
-import { AddUpdateMiniatureComponent } from 'src/app/shared/components/add-update-miniature/add-update-miniature.component';
-import { Miniature } from 'src/app/models/personaje.model';
+import { Personaje } from 'src/app/models/personaje.model';
 import { User } from 'src/app/models/user.model';
 import { SupabaseService } from 'src/app/services/supabase.service';
 import { QueryOptions } from '../../../services/query-options.interface';
 import { IonRefresherCustomEvent } from '@ionic/core';
+import { AddUpdatePersonajeComponent } from 'src/app/shared/components/add-update-personaje/add-update-personaje.component';
 
 @Component({
   selector: 'app-home',
@@ -24,99 +24,91 @@ import { IonRefresherCustomEvent } from '@ionic/core';
 
 export class HomePage implements OnInit {
   utilsService = inject(UtilsService);
-  firebaseService = inject(FirebaseService)
+  firebaseService = inject(FirebaseService);
   supabaseService = inject(SupabaseService);
-  miniatures: Miniature[] = [];
+  personajes: Personaje[] = []; // Cambié "miniatures" a "personajes"
   loading: boolean = false;
-  constructor() { addIcons({createOutline,trashOutline,bodyOutline,add}); }
 
-  ngOnInit() {
+  constructor() {
+    addIcons({ createOutline, trashOutline, bodyOutline, add });
   }
 
-  // signOut() {
-  //   this.firebaseService.signOut().then(() => {
-  //     this.utilsService.routerLink('/auth');
-  //   });
-  // }
+  ngOnInit() {}
 
-  async getMiniatures() {
+  async getPersonajes() { // Cambié "getMiniatures" a "getPersonajes"
     this.loading = true;
     const user = this.utilsService.getLocalStorageUser();
-    const path: string = `users/${user.uid}/miniatures`;
-    const queryOptions: QueryOptions = {orderBy: {field: "strength", direction: "desc"}}
+    const path: string = `users/${user.uid}/personajes`; // Cambié la ruta para personajes
+    const queryOptions: QueryOptions = { orderBy: { field: "strength", direction: "desc" } };
 
     let timer: any;
 
     const resetTimer = () => {
-        if (timer) {
-          clearTimeout(timer);
-        }
-        timer = setTimeout(() => {
-          sub.unsubscribe();
-
-        }, 5000) 
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        sub.unsubscribe();
+      }, 5000);
     };
 
     let sub = (await this.firebaseService.getCollectionData(path, queryOptions)).subscribe({
       next: (res: any) => {
-        console.log("Recibido cambio")
-        console.log(res)
-        this.miniatures = res;
+        console.log("Recibido cambio");
+        console.log(res);
+        this.personajes = res; // Cambié "miniatures" a "personajes"
         this.loading = false;
         resetTimer();
       },
     });
   }
 
-  async addUpdateMiniature(miniature?: Miniature) {
-    let success = await this.utilsService.presentModal({ component: AddUpdateMiniatureComponent, cssClass: "add-update-modal", componentProps: { miniature } })
+  async addUpdatePersonaje(personaje?: Personaje) { // Cambié "addUpdateMiniature" a "addUpdatePersonaje"
+    let success = await this.utilsService.presentModal({ component: AddUpdatePersonajeComponent, cssClass: "add-update-modal", componentProps: { personaje } });
     if (success) {
-      this.getMiniatures()
+      this.getPersonajes(); // Cambié "getMiniatures" a "getPersonajes"
     }
   }
 
   ionViewWillEnter() {
-    this.getMiniatures();
+    this.getPersonajes(); // Cambié "getMiniatures" a "getPersonajes"
   }
 
-  confirmDeleteMiniature(miniature: Miniature) {
+  confirmDeletePersonaje(personaje: Personaje) { // Cambié "confirmDeleteMiniature" a "confirmDeletePersonaje"
     this.utilsService.presentAlert({
-      header: 'Eliminar miniatura',
-      message: '¿Está seguro de que desea eliminar la miniatura?',
+      header: 'Eliminar Personaje',
+      message: '¿Está seguro de que desea eliminar el personaje?',
       buttons: [
+        { text: 'No' },
         {
-          text: 'No'
-        }, {
           text: 'Sí',
           handler: () => {
-            this.deleteMiniature(miniature);
+            this.deletePersonaje(personaje); // Cambié "deleteMiniature" a "deletePersonaje"
           }
         }
       ]
     });
   }
 
-  async deleteMiniature(miniature: Miniature) {
-
+  async deletePersonaje(personaje: Personaje) { // Cambié "deleteMiniature" a "deletePersonaje"
     const loading = await this.utilsService.loading();
     await loading.present();
 
-    const user: User = this.utilsService.getLocalStorageUser()
+    const user: User = this.utilsService.getLocalStorageUser();
+    const path: string = `users/${user.uid}/personajes/${personaje.id}`; // Cambié la ruta para personajes
 
-    const path: string = `users/${user.uid}/miniatures/${miniature.id}`
-
-    const imagePath = this.supabaseService.getFilePath(miniature.image)
+    const imagePath = this.supabaseService.getFilePath(personaje.image);
     await this.supabaseService.deleteFile(imagePath!);
 
     this.firebaseService.deleteDocument(path).then(res => {
-      this.miniatures = this.miniatures.filter(listedMiniature => listedMiniature.id !== miniature.id)
+      this.personajes = this.personajes.filter(listedPersonaje => listedPersonaje.id !== personaje.id); // Cambié "miniatures" a "personajes"
       this.utilsService.presentToast({
         color: "success",
         duration: 1500,
-        message: "Miniatura borrada exitosamente",
+        message: "Personaje borrado exitosamente", // Cambié "Miniatura" a "Personaje"
         position: "middle",
         icon: 'checkmark-circle-outline'
-      })
+      });
     }).catch(error => {
       this.utilsService.presentToast({
         color: "danger",
@@ -124,18 +116,17 @@ export class HomePage implements OnInit {
         message: error.message,
         position: "middle",
         icon: 'alert-circle-outline'
-      })
+      });
     }).finally(() => {
       loading.dismiss();
-    })
+    });
   }
+
   doRefresh(event: any) {
     setTimeout(() => {
-      this.getMiniatures();
+      this.getPersonajes(); // Cambié "getMiniatures" a "getPersonajes"
       event.target.complete();
     }, 2000);
   }
-  getTotalPower() {
-    return this.miniatures.reduce((total, miniature) => total + miniature.strength * miniature.units, 0)
-  }
+
 }

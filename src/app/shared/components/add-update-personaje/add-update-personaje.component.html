@@ -37,15 +37,15 @@
       <!-- Género -->
       <ion-item>
         <ion-label>Género</ion-label>
-        <ion-select [formControl]="form.controls.genre" placeholder="Selecciona un género">
+        <ion-select [formControl]="form.controls.gender" placeholder="Selecciona un género">
           <ion-select-option value="masculino">Masculino</ion-select-option>
           <ion-select-option value="femenino">Femenino</ion-select-option>
           <ion-select-option value="otro">Otro</ion-select-option>
         </ion-select>
       </ion-item>
 
-      <div class="validators" *ngIf="form.controls.genre.errors && form.controls.genre.touched">
-        <div *ngIf="form.controls.genre.errors?.['required']">
+      <div class="validators" *ngIf="form.controls.gender.errors && form.controls.gender.touched">
+        <div *ngIf="form.controls.gender.errors?.['required']">
           Debe seleccionar un género
         </div>
       </div>
