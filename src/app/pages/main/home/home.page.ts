@@ -21,60 +21,66 @@ import { AddUpdatePersonajeComponent } from 'src/app/shared/components/add-updat
   standalone: true,
   imports: [IonCard, IonRefresherContent, IonRefresher, IonSkeletonText, IonChip, IonAvatar, IonItemOption, IonItemOptions, IonList, IonItemSliding, IonItem, IonLabel, IonIcon, IonFabButton, IonFab, IonContent, CommonModule, FormsModule, HeaderComponent]
 })
-
 export class HomePage implements OnInit {
   utilsService = inject(UtilsService);
   firebaseService = inject(FirebaseService);
   supabaseService = inject(SupabaseService);
-  personajes: Personaje[] = []; // Cambié "miniatures" a "personajes"
-  loading: boolean = false;
+  personajes: Personaje[] = [];
+  loading: boolean = true;
 
   constructor() {
     addIcons({ createOutline, trashOutline, bodyOutline, add });
   }
 
-  ngOnInit() {}
-
-  async getPersonajes() { // Cambié "getMiniatures" a "getPersonajes"
-    this.loading = true;
-    const user = this.utilsService.getLocalStorageUser();
-    const path: string = `users/${user.uid}/personajes`; // Cambié la ruta para personajes
-    const queryOptions: QueryOptions = { orderBy: { field: "strength", direction: "desc" } };
-
-    let timer: any;
-
-    const resetTimer = () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
-        sub.unsubscribe();
-      }, 5000);
-    };
-
-    let sub = (await this.firebaseService.getCollectionData(path, queryOptions)).subscribe({
-      next: (res: any) => {
-        console.log("Recibido cambio");
-        console.log(res);
-        this.personajes = res; // Cambié "miniatures" a "personajes"
-        this.loading = false;
-        resetTimer();
-      },
-    });
+  ngOnInit() {
+    this.getPersonajes();
   }
 
-  async addUpdatePersonaje(personaje?: Personaje) { // Cambié "addUpdateMiniature" a "addUpdatePersonaje"
+  async getPersonajes() {
+    try {
+      this.loading = true;
+      const user = this.utilsService.getLocalStorageUser();
+      const path: string = `users/${user.uid}/miniatures`;
+      const queryOptions: QueryOptions = { orderBy: { field: "name", direction: "desc" } };
+
+      let timer: any;
+
+      const resetTimer = () => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          sub.unsubscribe();
+        }, 5000);
+      };
+
+      let sub = (await this.firebaseService.getCollectionData(path, queryOptions)).subscribe({
+        next: (res: any) => {
+          console.log("Recibido cambio");
+          console.log(res);
+          this.personajes = res;
+          this.loading = false;
+          resetTimer();
+        },
+      });
+    } catch (error) {
+      console.error('Error loading personajes:', error);
+      this.loading = false;
+    }
+  }
+
+  async addUpdatePersonaje(personaje?: Personaje) {
     let success = await this.utilsService.presentModal({ component: AddUpdatePersonajeComponent, cssClass: "add-update-modal", componentProps: { personaje } });
     if (success) {
-      this.getPersonajes(); // Cambié "getMiniatures" a "getPersonajes"
+      this.getPersonajes();
     }
   }
 
   ionViewWillEnter() {
-    this.getPersonajes(); // Cambié "getMiniatures" a "getPersonajes"
+    this.getPersonajes();
   }
 
-  confirmDeletePersonaje(personaje: Personaje) { // Cambié "confirmDeleteMiniature" a "confirmDeletePersonaje"
+  confirmDeletePersonaje(personaje: Personaje) {
     this.utilsService.presentAlert({
       header: 'Eliminar Personaje',
       message: '¿Está seguro de que desea eliminar el personaje?',
@@ -83,29 +89,29 @@ export class HomePage implements OnInit {
         {
           text: 'Sí',
           handler: () => {
-            this.deletePersonaje(personaje); // Cambié "deleteMiniature" a "deletePersonaje"
+            this.deletePersonaje(personaje);
           }
         }
       ]
     });
   }
 
-  async deletePersonaje(personaje: Personaje) { // Cambié "deleteMiniature" a "deletePersonaje"
+  async deletePersonaje(personaje: Personaje) {
     const loading = await this.utilsService.loading();
     await loading.present();
 
     const user: User = this.utilsService.getLocalStorageUser();
-    const path: string = `users/${user.uid}/personajes/${personaje.id}`; // Cambié la ruta para personajes
+    const path: string = `users/${user.uid}/miniatures/${personaje.id}`;
 
     const imagePath = this.supabaseService.getFilePath(personaje.image);
     await this.supabaseService.deleteFile(imagePath!);
 
     this.firebaseService.deleteDocument(path).then(res => {
-      this.personajes = this.personajes.filter(listedPersonaje => listedPersonaje.id !== personaje.id); // Cambié "miniatures" a "personajes"
+      this.personajes = this.personajes.filter(listedPersonaje => listedPersonaje.id !== personaje.id);
       this.utilsService.presentToast({
         color: "success",
         duration: 1500,
-        message: "Personaje borrado exitosamente", // Cambié "Miniatura" a "Personaje"
+        message: "Personaje borrado exitosamente",
         position: "middle",
         icon: 'checkmark-circle-outline'
       });
@@ -124,9 +130,8 @@ export class HomePage implements OnInit {
 
   doRefresh(event: any) {
     setTimeout(() => {
-      this.getPersonajes(); // Cambié "getMiniatures" a "getPersonajes"
+      this.getPersonajes();
       event.target.complete();
     }, 2000);
   }
-
 }

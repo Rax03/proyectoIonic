@@ -1,11 +1,52 @@
-.auth-form {
-    width: 100%;
-    text-align: center;
+:root {
+    --primary-color: #ff6f61; /* Color principal inspirado en el anime */
+    --secondary-color: #ffe0b3; /* Color secundario */
+    --background-image: url('/AnimeLG/src/assets/anime-background.jpg'); /* Imagen de fondo de anime */
+    --font-family: 'Comic Sans MS', cursive, sans-serif; /* Fuente inspirada en anime */
+  }
+  
+  ion-content {
+    background: var(--secondary-color) url(var(--background-image)) no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+    font-family: var(--font-family);
+  }
+  
+  .d-flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+  
+  .auth-form {
+    background: rgba(0, 0, 0, 0.7);
     padding: 20px;
-}
-
-@media (min-width: 769px) {
-    .auth-form {
-        width: 500px;
-    }
-}
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  ion-button {
+    --background: var(--primary-color);
+    --border-radius: 10px;
+    --color: #fff;
+  }
+  
+  ion-button[fill="outline"] {
+    --border-color: var(--primary-color);
+    --color: var(--primary-color);
+  }
+  
+  .validators {
+    color: #ff4444;
+    font-size: 0.8em;
+  }
+  
+  .app-custom-input {
+    margin-bottom: 15px;
+  }
+  
+  p {
+    font-size: 0.9em;
+  }
+  

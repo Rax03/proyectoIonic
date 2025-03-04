@@ -19,7 +19,7 @@ import {
   alertCircleOutline,
 } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { LogoComponent } from '../../shared/components/logo/logo.component';
+import { LogoComponent } from '../../../assets/logo/logo.component';
 import { RouterLink } from '@angular/router';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';

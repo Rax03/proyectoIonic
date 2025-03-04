@@ -6,7 +6,7 @@ import { HeaderComponent } from "../../../shared/components/header/header.compon
 import { CustomInputComponent } from "../../../shared/components/custom-input/custom-input.component";
 import { lockClosedOutline, mailOutline, personAddOutline, personOutline, alertCircleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { LogoComponent } from "../../../shared/components/logo/logo.component";
+import { LogoComponent } from "../../../../assets/logo/logo.component";
 import { RouterLink } from '@angular/router';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';

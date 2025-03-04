@@ -6,7 +6,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { CustomInputComponent } from 'src/app/shared/components/custom-input/custom-input.component';
 import { mailOutline, alertCircleOutline, sendOutline, mailUnreadOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { LogoComponent } from 'src/app/shared/components/logo/logo.component';
+import { LogoComponent } from 'src/assets/logo/logo.component';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 

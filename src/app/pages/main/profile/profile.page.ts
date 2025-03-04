@@ -36,6 +36,7 @@ export class ProfilePage implements OnInit {
 
     const loading = await this.utilsService.loading();
     await loading.present();
+    
 
     const path: string = `users/${this.user.uid}`
     const imagePath = `${this.user.uid}/profile`

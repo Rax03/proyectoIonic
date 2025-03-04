@@ -109,7 +109,7 @@ export class AddUpdatePersonajeComponent implements OnInit {
     const loading = await this.utilsService.loading();
     await loading.present();
 
-    const path: string = `users/${this.user.uid}/personaje/${this.personaje!.id}`;
+    const path: string = `users/${this.user.uid}/miniatures/${this.personaje!.id}`;
 
     if (this.form.value.image !== this.personaje!.image) {
       const imageDataUrl = this.form.value.image;
