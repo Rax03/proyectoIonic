@@ -8,10 +8,10 @@
   ion-content {
     background: var(--secondary-color) url(var(--background-image)) no-repeat center center fixed;
     background-size: cover;
-    color: #fff;
+    color: #ffffff;
     font-family: var(--font-family);
   }
-  
+
   .d-flex-center {
     display: flex;
     justify-content: center;
@@ -29,12 +29,12 @@
   ion-button {
     --background: var(--primary-color);
     --border-radius: 10px;
-    --color: #fff;
+    --color: #ffffff;
   }
   
   ion-button[fill="outline"] {
     --border-color: var(--primary-color);
-    --color: var(--primary-color);
+    --color: #ffffff;
   }
   
   .validators {

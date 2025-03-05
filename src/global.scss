@@ -36,18 +36,28 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
 
+/* Custom Variables */
+:root {
+  --primary-color: #ff6f61; /* Color principal inspirado en el anime */
+  --secondary-color: #ffe0b3; /* Color secundario */
+  --background-image: url('assets/anime-background.jpg'); /* Imagen de fondo de anime */
+  --font-family: 'Comic Sans MS', cursive, sans-serif; /* Fuente inspirada en anime */
+}
+
 .d-flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .validators {
-    color: var(--ion-color-danger);
-    font-size: 13px;
-    text-align: center;
+  color: var(--ion-color-danger);
+  font-size: 13px;
+  text-align: center;
 }
 
 .submit {
-    margin-top: 40px;
+  margin-top: 40px;
 }
+
+
